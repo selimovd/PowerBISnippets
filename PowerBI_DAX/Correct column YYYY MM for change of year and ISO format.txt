@@ -1,0 +1,18 @@
+Date YEAR/WEEK correct = 
+ADDCOLUMNS(
+        CALENDAR (
+            DATE(2020, 12, 01),
+            DATE(2022, 01, 31)
+        ),
+        "DateAsInteger", FORMAT ( [Date], "YYYYMMDD" ),
+        "Year", YEAR ( [Date] ),
+        "Monthnumber", FORMAT ( [Date], "MM" ),
+        "Weeknumber", FORMAT(WEEKNUM ([Date],21),00),
+        "YearWeeknumber_Wrong", FORMAT ([Date], "YYYY" ) & "/" & FORMAT(WEEKNUM ([Date],21), "00"), -- WRONG - returns at the end of 2020 "2021/53"
+        "YearWeeknumber_Right", -- RIGHT - returns at the end of 2020 "2020/53"
+            SWITCH(TRUE(),
+                MONTH( [Date] ) = 1 && WEEKNUM ( [Date], 21 ) > 50, YEAR( [Date] ) - 1,
+                MONTH( [Date] ) = 12 && WEEKNUM  ([Date], 21 ) = 1, YEAR( [Date] ) + 1,
+                YEAR( [Date] )
+            ) & "/" & FORMAT( WEEKNUM ( [Date],21 ), "00")
+)

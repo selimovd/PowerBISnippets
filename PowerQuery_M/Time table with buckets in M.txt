@@ -1,0 +1,36 @@
+let
+    Source = List.Times(#time(0, 0, 0), 1440, #duration(0, 0, 1, 0)),
+    #"Converted to Table" = Table.FromList(Source, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    #"Renamed Columns" = Table.RenameColumns(#"Converted to Table",{{"Column1", "Time"}}),
+    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns",{{"Time", type text}}),
+    #"Duplicated Column" = Table.DuplicateColumn(#"Changed Type", "Time", "Time - Copy"),
+    #"Split Column by Delimiter" = Table.SplitColumn(#"Duplicated Column", "Time - Copy", Splitter.SplitTextByEachDelimiter({":"}, QuoteStyle.Csv, false), {"Time - Copy.1", "Time - Copy.2"}),
+    #"Changed Type1" = Table.TransformColumnTypes(#"Split Column by Delimiter",{{"Time - Copy.1", Int64.Type}, {"Time - Copy.2", type text}}),
+    #"Renamed Columns1" = Table.RenameColumns(#"Changed Type1",{{"Time - Copy.1", "Hour of Day"}}),
+    #"Changed Type2" = Table.TransformColumnTypes(#"Renamed Columns1",{{"Time - Copy.2", Int64.Type}}),
+    #"Renamed Columns2" = Table.RenameColumns(#"Changed Type2",{{"Time - Copy.2", "Minute"}}),
+    #"Duplicated Column1" = Table.DuplicateColumn(#"Renamed Columns2", "Time", "TimeID"),
+    #"Replaced Value" = Table.ReplaceValue(#"Duplicated Column1",":","",Replacer.ReplaceText,{"TimeID"}),
+    #"Changed Type4" = Table.TransformColumnTypes(#"Replaced Value",{{"TimeID", Int64.Type}}),
+    #"5 Mins" = Table.AddColumn(#"Changed Type4", "5 Mins", each if Number.IntegerDivide([Minute],5) = 0 then "00:00"
+        else if Number.IntegerDivide([Minute],5) = 1 then "00:05"
+        else if Number.IntegerDivide([Minute],5) = 2 then "00:10"
+        else if Number.IntegerDivide([Minute],5) = 3 then "00:15"
+        else if Number.IntegerDivide([Minute],5) = 4 then "00:20"
+        else if Number.IntegerDivide([Minute],5) = 5 then "00:25"
+        else if Number.IntegerDivide([Minute],5) = 6 then "00:30"
+        else if Number.IntegerDivide([Minute],5) = 7 then "00:35"
+        else if Number.IntegerDivide([Minute],5) = 8 then "00:40"
+        else if Number.IntegerDivide([Minute],5) = 9 then "00:45"
+        else if Number.IntegerDivide([Minute],5) = 10 then "00:50"
+        else "00:55"),
+    #"15 Mins" = Table.AddColumn(#"5 Mins", "15 Mins", each if Number.IntegerDivide([Minute],15) = 0 then "00:00"
+        else if Number.IntegerDivide([Minute],15) = 1 then "00:15"
+        else if Number.IntegerDivide([Minute],15) = 2 then "00:30"
+        else "00:45"),
+    #"30 Mins" = Table.AddColumn(#"15 Mins", "30 Mins", each if Number.IntegerDivide([Minute],30) = 0 then "00:00"
+        else "00:30"),
+    #"Changed Type3" = Table.TransformColumnTypes(#"30 Mins",{{"Time", type time}}),
+    #"Reordered Columns" = Table.ReorderColumns(#"Changed Type3",{"TimeID", "Time", "Hour of Day", "Minute", "5 Mins", "15 Mins", "30 Mins"})
+in
+    #"Reordered Columns"

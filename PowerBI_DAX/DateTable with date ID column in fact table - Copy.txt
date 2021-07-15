@@ -1,0 +1,27 @@
+Dim Date = 
+VAR _MinDateID = MIN ( FactTable[DateID] ) -- DateID in the Format YYYYMMDD, like 20201031, otherwise you snipped with date column
+VAR _MaxDateID = MAX ( FactTable[DateID] )
+VAR _MinYear = LEFT ( _MinDateID, 4 )
+VAR _MaxYear = LEFT ( _MaxDateID, 4 )
+VAR _MinDate = DATE ( _MinYear, 1, 1 ) 
+VAR _MaxDate = DATE ( _MaxYear, 12, 31 )
+RETURN
+    ADDCOLUMNS (
+        CALENDAR (
+            _MinDate,
+            _MaxDate
+        ),
+        "DateID", FORMAT ( [Date], "YYYYMMDD" ),
+        "Year", YEAR ( [Date] ),
+        "Monthnumber", FORMAT ( [Date], "MM" ),
+        "YearMonthnumber", FORMAT ( [Date], "YYYY/MM" ),
+        "YearMonth", FORMAT ( [Date], "YYYY/mmm" ),
+        "MonthNameShort", FORMAT ( [Date], "mmm" ),
+        "MonthName", FORMAT ( [Date], "mmmm" ),
+        "DayOfWeekNumber", WEEKDAY ( [Date] , 2), -- adapt the start day of week to your needs, 1 for Sunday, 2 for Monday etc.
+        "DayOfWeekShort", FORMAT ( [Date], "ddd" ),
+        "DayOfWeek", FORMAT ( [Date], "dddd" ),
+        "Weeknumber", WEEKNUM([Date], 21), -- adapt the weeknumber to your needs, 1 for US System, 21 for ISO, for more details see https://dax.guide/weeknum/
+        "Quarter", "Q" & FORMAT ( [Date], "Q" ),
+        "YearQuarter", FORMAT ( [Date], "YYYY" ) & "/Q" & FORMAT ( [Date], "Q" )
+    )

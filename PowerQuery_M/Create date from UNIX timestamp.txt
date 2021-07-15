@@ -1,0 +1,8 @@
+let
+    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("TcqxDQAgCATAXawtnodnGcL+a2illJdc1bJEmJPhq/ejqEEPcTCA/ASgSVre3Ac=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [TimeStamp = _t]),
+    #"Convert Timestamp to Number" = Table.TransformColumnTypes(Source,{{"TimeStamp", Int64.Type}}),
+    // More information in the blog article: https://whatthefact.bi/power-bi/dax/convert-unix-timestamp-to-date-or-datetime-format-in-power-bi/
+    // Create date January 1st 1970 and add the timestamp duration in seconds to it:
+    #"Added Custom" = Table.AddColumn(#"Convert Timestamp to Number", "Date", each #datetime(1970, 1, 1, 0, 0, 0) + #duration(0, 0, 0, [TimeStamp]))
+in
+    #"Added Custom"

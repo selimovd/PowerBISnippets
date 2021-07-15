@@ -1,0 +1,7 @@
+let
+    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("XcwxCsAgEETRqwTrILOzWU3mKuL9rxHRFBL41St+a4lPNmSCOHDLquipn38nhZju2N2rnMtt96uMpmO4LaeLUHzO3aMI49Nf", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Date = _t]),
+    #"Changed to DateTime" = Table.TransformColumnTypes(Source,{{"Date", type datetime}}),
+    #"Changed to Date" = Table.TransformColumnTypes(#"Changed to DateTime",{{"Date", type date}}),
+    #"Add DateID" = Table.AddColumn(#"Changed to Date", "DateID", each Number.FromText(Text.Combine({Date.ToText([Date], "yyyy"), Date.ToText([Date], "MM"), Date.ToText([Date], "dd")})))
+in
+    #"Add DateID"

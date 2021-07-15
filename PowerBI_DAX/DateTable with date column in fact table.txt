@@ -1,0 +1,23 @@
+Dim Date = 
+VAR _MinDate = DATE ( YEAR ( MIN ( FactTable[Date] ) ), 1, 1 ) -- use FIRSTNONBLANK if fact table contains BLANK dates
+VAR _MaxDate = DATE ( YEAR ( MAX ( FactTable[Date] ) ), 12, 31 ) -- use LASTNONBLANK if fact table contains BLANK dates
+RETURN
+    ADDCOLUMNS (
+        CALENDAR (
+            _MinDate,
+            _MaxDate
+        ),
+        "DateID", FORMAT ( [Date], "YYYYMMDD" ),
+        "Year", YEAR ( [Date] ),
+        "Monthnumber", FORMAT ( [Date], "MM" ),
+        "YearMonthnumber", FORMAT ( [Date], "YYYY/MM" ),
+        "YearMonth", FORMAT ( [Date], "YYYY/mmm" ),
+        "MonthNameShort", FORMAT ( [Date], "mmm" ),
+        "MonthName", FORMAT ( [Date], "mmmm" ),
+        "DayOfWeekNumber", WEEKDAY ( [Date] , 2), -- adapt the start day of week to your needs, 1 for Sunday, 2 for Monday etc.
+        "DayOfWeekShort", FORMAT ( [Date], "ddd" ),
+        "DayOfWeek", FORMAT ( [Date], "dddd" ),
+        "Weeknumber", WEEKNUM([Date], 21), -- adapt the weeknumber to your needs, 1 for US System, 21 for ISO, for more details see https://dax.guide/weeknum/
+        "Quarter", "Q" & FORMAT ( [Date], "Q" ),
+        "YearQuarter", FORMAT ( [Date], "YYYY" ) & "/Q" & FORMAT ( [Date], "Q" )
+    )

@@ -1,0 +1,8 @@
+Date = 
+ADDCOLUMNS(
+    CALENDAR( DATE( 2021, 1, 1 ), DATE( 2021, 12, 31 ) ),
+    "Weekday", FORMAT([Date], "dddd"),
+    "Week Number Sunday", WEEKNUM( [Date], 1 ), -- North American format and week start Sunday
+    "Week Number Monday", WEEKNUM( [Date], 2 ), -- North American format and week start Monday
+    "Week Number ISO", WEEKNUM( [Date], 21 ) -- European ISO format and week start Monday
+)
